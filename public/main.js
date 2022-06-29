@@ -1,0 +1,16 @@
+const socket = io.connect();
+socket.on('messages', data => {
+    console.log(data);
+});
+
+function render(data) {
+    const html = data.map((elem, index) => {
+        return (`<div>
+            <strong>${elem.author}</strong>:
+            <em>${elem.text}</em> </div>`)
+    }).join(" ");
+    document.getElementById('messages').innerHTML = html;
+}
+
+socket.on('messages', function (data) { render(data); });
+

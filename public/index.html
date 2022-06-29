@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi aplicación sockets</title>
+    <script src="/socket.io.socket.io.js"></script>
+    <script src="main.js"></script>
+
+</head>
+
+<body>
+    <form action="/movies" method="POST">
+        <h4>Título</h4> <input type="text" name="title">
+        <h4>Precio</h4> <input type="number" name="price">
+        <h4>Imagen</h4> <input type="text" name="thumbnail">
+        <input type="submit" value="Agregar película">
+    </form>
+    <div id="messages"></div>
+
+</body>
+
+</html>
