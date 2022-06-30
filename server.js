@@ -5,6 +5,10 @@ import routes from './api/movies.js'
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { engine } from 'express-handlebars'
+import { Server } from "socket.io";
+const movies = []
+const messages = []
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,7 +30,7 @@ app.set("views", path.join(__dirname, "./views"));
 app.set("view engine", "hbs");
 
 
-app.listen(port, (err) => {
+const serverExpress = app.listen(port, (err) => {
     if (err) {
         console.log(`Se produjo un error al iniciar el servidor ${err}`)
     } else {
@@ -36,18 +40,21 @@ app.listen(port, (err) => {
 
 //Sockets
 
-httpServer.listen(8080, function () {
-    console.log('Servidor corriendo en http://localhost:8080');
-})
+const io = new Server(serverExpress);
 
+io.on('connection', socket => {
+    console.log(`Un usuario se ha conectado: ${socket.id}`);
+    io.emit("server:movie", movies);
+    io.emit("server:message", messages);
 
-const messages = [
-    { author: "Juan", text: "¡Hola! ¿Que tal?" },
-    { author: "Pedro", text: "¡Muy bien! ¿Y vos?" },
-    { author: "Ana", text: "¡Genial!" }
-];
+    socket.on("client:movie", (movie) => {
+        movies.push(movie);
+        io.emit("server:movie", movies);
+    });
 
-io.on('connection', function (socket) {
-    console.log('Un cliente se ha conectado');
-    socket.emit('messages', messages);
+    socket.on('new-message', data => {
+        messages.push(data);
+        io.sockets.emit('messages', messages);
+    });
 });
+
