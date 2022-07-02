@@ -1,21 +1,22 @@
-const socket = io.connect();
+const socket = io();
 
 //AddMovieForm
 const moviesForm = document.getElementById('moviesForm')
-const title = document.getElementById("moviesForm").elements["title"]
-const price = document.getElementById("moviesForm").elements["price"]
-const thumbnail = document.getElementById("moviesForm").elements["thumbnail"]
+const titleInput = document.getElementById("moviesForm").elements["title"]
+const priceInput = document.getElementById("moviesForm").elements["price"]
+const thumbnailInput = document.getElementById("moviesForm").elements["thumbnail"]
 
 //Chat
-const chatForm = document.getElementById('moviesForm')
-const username = document.getElementById("moviesForm").elements["username"]
-const message = document.getElementById("moviesForm").elements["message"]
+const chatForm = document.getElementById('chatForm')
+const usernameInput = document.getElementById("chatForm").elements["username"]
+const messageInput = document.getElementById("chatForm").elements["message"]
+const messagesPool = document.getElementById('messagesPool')
 
 function addMovie() {
     try {
-        let title = title.value;
-        let price = Number(price.value);
-        let thumbnail = thumbnail.value;
+        const title = titleInput.value;
+        const price = Number(priceInput.value);
+        const thumbnail = thumbnailInput.value;
         socket.emit("client:movie", { title, price, thumbnail });
     } catch (err) {
         console.log(`Hubo un error ${err}`);
@@ -23,8 +24,8 @@ function addMovie() {
 }
 
 async function renderMovies(movies) {
-    let response = await fetch('./movies.hbs')
-    let moviesTable = await response.text()
+    const response = await fetch('/movies.hbs')
+    const moviesTable = await response.text()
     document.getElementById("movies").innerHTML = "";
     movies.forEach((movie) => {
         const template = Handlebars.compile(moviesTable);
@@ -33,16 +34,14 @@ async function renderMovies(movies) {
     });
 }
 
-socket.on('messages', function (data) { render(data); });
-
 function sendMessage() {
     try {
-        let user = username.value;
-        let message = message.value;
-        let date = new Date().toLocaleString("es-AR")
+        const user = usernameInput.value;
+        const message = messageInput.value;
+        const date = new Date().toLocaleString("es-AR")
         socket.emit("client:message", { user, message, date });
     } catch (error) {
-        console.log(`Han error has ocurred; ${error}`);
+        console.log(`Hubo un error ${error}`);
     }
 }
 
@@ -71,15 +70,15 @@ const renderMessages = (messages) => {
 moviesForm.addEventListener("submit", (event) => {
     event.preventDefault();
     sendProduct();
-    title.value = "";
-    price.value = "";
-    thumbnail.value = "";
+    titleInput.value = "";
+    priceInput.value = "";
+    thumbnailInput.value = "";
 });
 
-formMessage.addEventListener("submit", (event) => {
+chatForm.addEventListener("submit", (event) => {
     event.preventDefault();
     sendMessage();
-    message.value = "";
+    messageInput.value = "";
 });
 
 socket.on("server:movie", renderMovies);
