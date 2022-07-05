@@ -2,16 +2,17 @@ const socket = io();
 
 //AddMovieForm
 const moviesForm = document.getElementById('moviesForm')
-const titleInput = document.getElementById("moviesForm").elements["title"]
-const priceInput = document.getElementById("moviesForm").elements["price"]
-const thumbnailInput = document.getElementById("moviesForm").elements["thumbnail"]
+const titleInput = document.getElementById("moviesForm").title
+const priceInput = document.getElementById("moviesForm").price
+const thumbnailInput = document.getElementById("moviesForm").thumbnail
 
 //Chat
 const chatForm = document.getElementById('chatForm')
-const usernameInput = document.getElementById("chatForm").elements["username"]
-const messageInput = document.getElementById("chatForm").elements["message"]
+const usernameInput = document.getElementById("chatForm").username
+const messageInput = document.getElementById("chatForm").message
 const messagesPool = document.getElementById('messagesPool')
 
+//Agregar nueva pelicula
 function addMovie() {
     try {
         const title = titleInput.value;
@@ -23,9 +24,11 @@ function addMovie() {
     }
 }
 
+//Renderiza las peliculas
 async function renderMovies(movies) {
     const response = await fetch('/movies.hbs')
     const moviesTable = await response.text()
+    console.log('movies', moviesTable)
     document.getElementById("movies").innerHTML = "";
     movies.forEach((movie) => {
         const template = Handlebars.compile(moviesTable);
@@ -49,15 +52,15 @@ const renderMessages = (messages) => {
     try {
         const html = messages
             .map((messageInfo) => {
-                return `
+                return (`
                 <div class="col-8">
-                    <p><span class="userEmail fw-bold">${messageInfo.userEmail} :</span>
-                        <span class="userMessage text-primary">${messageInfo.message}</span>
+                    <p><span class="userEmail text-primary font-weight-bold">${messageInfo.user} :</span>
+                        <span class="userMessage font-italic text-success">${messageInfo.message}</span>
                     </p>
                 </div>
                 <div class="col-4">
                     <p>${messageInfo.date}</p>
-                </div>`;
+                </div>`)
             })
             .join(" ");
 
@@ -69,7 +72,7 @@ const renderMessages = (messages) => {
 
 moviesForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    sendProduct();
+    addMovie();
     titleInput.value = "";
     priceInput.value = "";
     thumbnailInput.value = "";
@@ -81,5 +84,12 @@ chatForm.addEventListener("submit", (event) => {
     messageInput.value = "";
 });
 
-socket.on("server:movie", renderMovies);
-socket.on("server:message", renderMessages);
+// socket.on("server:movie", renderMovies);
+// socket.on("server:message", renderMessages);
+
+//Pone socket a escuchar
+socket.on('server:movie', movie => {
+    renderMovies(movie)
+})
+
+socket.on('server:message', renderMessages);

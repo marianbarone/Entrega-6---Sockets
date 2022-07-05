@@ -1,12 +1,12 @@
 {
-  "name": "entrega5",
+  "name": "entrega6",
   "version": "1.1.0",
   "description": "",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +16,8 @@
     "pug": "^3.0.2",
     "pug-cli": "^1.0.0-alpha6",
     "socket.io": "^4.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.18"
   }
 }

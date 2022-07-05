@@ -3,11 +3,7 @@ const app = express()
 const port = 8080
 import path from 'path'
 import { fileURLToPath } from 'url';
-import { engine } from 'express-handlebars'
 import { Server } from "socket.io";
-const movies = [];
-const messages = [];
-
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,19 +21,30 @@ app.use(express.static(path.join(__dirname, "./public")));
 
 const io = new Server(serverExpress);
 
+//Arrays donde voy a guardar las movies y messages
+const movies = [];
+const messages = [];
+console.log(movies)
+
 io.on('connection', socket => {
     console.log(`Un usuario se ha conectado: ${socket.id}`);
-    io.emit("server:movie", movies);
-    io.emit("server:message", messages);
+    //muestra a cada cliente que se conecte los productos y mensajes guardados
+    socket.emit("server:movie", movies);
+    socket.emit("server:message", messages);
 
     socket.on("client:movie", (movie) => {
         movies.push(movie);
+        console.log('movies', movies)
+        console.log('movie', movie)
         io.emit("server:movie", movies);
     });
 
-    socket.on('new-message', messageInfo => {
+    //Aca estaba el error con la conexion de los mensajes
+    //Estaba mal configurado
+    socket.on('client:message', messageInfo => {
         messages.push(messageInfo);
-        io.sockets.emit('messages', messages);
+        console.log('soy messages',messages)
+        io.emit('server:message', messages);
     });
 });
 
