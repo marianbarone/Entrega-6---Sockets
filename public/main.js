@@ -2,14 +2,14 @@ const socket = io();
 
 //AddMovieForm
 const moviesForm = document.getElementById('moviesForm')
-const titleInput = document.getElementById("moviesForm").elements["title"]
-const priceInput = document.getElementById("moviesForm").elements["price"]
-const thumbnailInput = document.getElementById("moviesForm").elements["thumbnail"]
+const titleInput = document.getElementById("moviesForm").title
+const priceInput = document.getElementById("moviesForm").price
+const thumbnailInput = document.getElementById("moviesForm").thumbnail
 
 //Chat
 const chatForm = document.getElementById('chatForm')
-const usernameInput = document.getElementById("chatForm").elements["username"]
-const messageInput = document.getElementById("chatForm").elements["message"]
+const usernameInput = document.getElementById("chatForm").username
+const messageInput = document.getElementById("chatForm").message
 const messagesPool = document.getElementById('messagesPool')
 
 function addMovie() {
@@ -81,5 +81,9 @@ chatForm.addEventListener("submit", (event) => {
     messageInput.value = "";
 });
 
-socket.on("server:movie", renderMovies);
-socket.on("server:message", renderMessages);
+//Pone socket a escuchar
+socket.on('server:movie', movie => {
+    renderMovies(movie)
+})
+
+socket.on('server:message', renderMessages);
