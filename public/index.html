@@ -11,8 +11,8 @@
 </head>
 
 <body>
-    <div class="container">
-        <form class='form col-4 mx-auto mt-4' id="moviesForm">
+    <div class="container-fluid pl-0" style="margin-left: 100px; padding-left: 0">
+        <form class='form-floating form w-25 mt-4' id="moviesForm">
             <h2>
                 Movies
             </h2>
@@ -20,25 +20,23 @@
                 Agregá una película
                 <h3>
                     <div class="form-floating mb-3 fs-6">
-                        <input type="text" name="titleInput" class="form-control" id="floatingInput"
-                            placeholder="Batman Begins">
+                        <input type="text" name="title" class="form-control" id="titulo" placeholder="Batman Begins">
                         <label for="title">Título</label>
                     </div>
                     <div class="form-floating mb-3 fs-6">
-                        <input type="number" name="priceInput" class="form-control" id="floatingInput"
-                            placeholder="Precio">
+                        <input type="number" name="price" class="form-control" id="price" placeholder="Precio">
                         <label for="price">Precio</label>
                     </div>
                     <div class="form-floating mb-3 fs-6">
-                        <input type="text" name='thumbnailInput' class="form-control" id="floatingInput"
-                            placeholder="Imágen">
+                        <input type="text" name='thumbnail' class="form-control" id="imagen" placeholder="Imágen">
                         <label for="thumbnail">Imagen</label>
-                        <input type="submit" value="Agregar" class="btn btn-primary mt-3 mr-1">
                     </div>
+                    <button type="submit" class="btn btn-dark">Enviar</button>
+
         </form>
     </div>
 
-    <table class="table table-light col-6 mx-auto mt-4 w-75">
+    <table class="table table-light mt-4 w-75" style="margin-left: 100px">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Título</th>
@@ -50,15 +48,21 @@
         </tbody>
     </table>
 
-    <h3 class="w-75 mx-auto">Chat</h3>
-    <form class='form-floating form col-4 mx-auto mt-4' id="chatForm">
-        <input type="email" name="usernameInput" class="form-control" id="floatingInput"
-            placeholder="michael.scott@dundlermiffin.co">
-        <input type="text" name="messageInput" class="form-control" id="floatingInput" placeholder="Cuéntanos algo...">
-        <input type="submit" class="btn btn-dark" value="Enviar">
+    <h3 class="w-75" style="margin-left: 100px">Chat</h3>
+    <form class='form-floating form w-25 ml-5 col-4 mt-4' id="chatForm" style="margin-left: 100px">
+        <div class="form-floating mb-3 fs-6">
+            <input type="email" name="usernameInput" class="form-control" id="username"
+                placeholder="michael.scott@dundlermiffin.co">
+            <label for="username">Email</label>
+        </div>
+        <div class="form-floating mb-3 fs-6">
+            <input type="text" name="messageInput" class="form-control" id="message" placeholder="Cuéntanos algo...">
+            <label for="message">Mensaje</label>
+        </div>
+        <button type="submit" class="btn btn-dark" id="btnChat">Enviar</button>
     </form>
 
-    <div class="w-75 mx-auto">
+    <div class="w-75 mt-4" style="margin-left: 100px">
         <h3 class="mx-auto">Mensajes</h3>
         <div id="messagesPool" class="row">
         </div>
@@ -69,8 +73,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
         crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <!-- Importo libreria socket.io -->
     <script src="/socket.io/socket.io.js"></script>
-    <script src="main.js"></script>
+    <!-- Importo configuración de los sockets -->
+    <script src="./main.js"></script>
 </body>
 
 </html>

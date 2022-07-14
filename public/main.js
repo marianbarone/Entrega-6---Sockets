@@ -12,6 +12,7 @@ const usernameInput = document.getElementById("chatForm").username
 const messageInput = document.getElementById("chatForm").message
 const messagesPool = document.getElementById('messagesPool')
 
+//Agregar nueva pelicula
 function addMovie() {
     try {
         const title = titleInput.value;
@@ -23,9 +24,11 @@ function addMovie() {
     }
 }
 
+//Renderiza las peliculas
 async function renderMovies(movies) {
     const response = await fetch('/movies.hbs')
     const moviesTable = await response.text()
+    console.log('movies', moviesTable)
     document.getElementById("movies").innerHTML = "";
     movies.forEach((movie) => {
         const template = Handlebars.compile(moviesTable);
@@ -49,15 +52,15 @@ const renderMessages = (messages) => {
     try {
         const html = messages
             .map((messageInfo) => {
-                return `
+                return (`
                 <div class="col-8">
-                    <p><span class="userEmail fw-bold">${messageInfo.userEmail} :</span>
-                        <span class="userMessage text-primary">${messageInfo.message}</span>
+                    <p><span class="userEmail text-primary font-weight-bold">${messageInfo.user} :</span>
+                        <span class="userMessage font-italic text-success">${messageInfo.message}</span>
                     </p>
                 </div>
                 <div class="col-4">
                     <p>${messageInfo.date}</p>
-                </div>`;
+                </div>`)
             })
             .join(" ");
 
@@ -69,7 +72,7 @@ const renderMessages = (messages) => {
 
 moviesForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    sendProduct();
+    addMovie();
     titleInput.value = "";
     priceInput.value = "";
     thumbnailInput.value = "";
