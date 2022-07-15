@@ -6,4 +6,4 @@ const configSqlite = {
     useNullAsDefault: true
 }
 
-export default configSqlite;
+export default configSqlite

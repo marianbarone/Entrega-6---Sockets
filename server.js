@@ -4,8 +4,8 @@ const port = 8080
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { Server } from "socket.io";
-import moviesController from "./controllers/productsManager.js";
-import messagesController from "./controllers/messagesManager.js";
+// import moviesController from "./controllers/products-controller.js";
+import messagesController from "./controllers/messages-controller.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,10 +23,10 @@ app.use(express.static(path.join(__dirname, "./public")));
 
 const io = new Server(serverExpress);
 
-const movies = await moviesController.getAll();
+// const movies = await moviesController.getAll();
 
 const messages = await messagesController.getAll();
-console.log(movies)
+// console.log(movies)
 
 io.on('connection', socket => {
     console.log(`Un usuario se ha conectado: ${socket.id}`);
