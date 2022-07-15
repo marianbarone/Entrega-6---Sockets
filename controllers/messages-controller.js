@@ -7,21 +7,41 @@ export class messagesController {
         this.config = config;
 
         try {
+            
+            const sqliteClient = knex(configSqlite)
 
-            knex(this.config).schema.hasTable(this.table).then(exists => {
-                if (!exists) {
-                    return knex(this.config).schema.createTable(this.config, table => {
-                        table.increments('id')
-                        table.string('user')
-                        table.string('message')
-                        table.timestamp('date').defaultTo(knex.fn.now())
-                    })
-                }
+            sqliteClient.schema.dropTableIfExists(this.table)
+
+            sqliteClient.schema.createTable(this.table, table => {
+                table.increments('id').primary()
+                table.string('user')
+                table.string('message')
+                table.timestamp('date').defaultTo(knex.fn.now())
             })
 
-        } catch (err) {
-            console.log(`Hubo un error ${err}`);
+            sqliteClient.destroy()
+
+            console.log('tabla mensajes en sqlite3 creada con éxito')
+        } catch (error) {
+            console.log('error al crear tabla mensajes en sqlite3')
         }
+
+        // try {
+
+            // knex(this.config).schema.hasTable(this.table).then(exists => {
+            //     if (!exists) {
+            //         return knex(this.config).schema.createTable(this.config, table => {
+            //             table.increments('id')
+            //             table.string('user')
+            //             table.string('message')
+            //             table.timestamp('date').defaultTo(knex.fn.now())
+            //         })
+            //     }
+            // })
+
+        // } catch (err) {
+        //     console.log(`Hubo un error ${err}`);
+        // }
     }
 
     async addMessage() {
@@ -32,10 +52,10 @@ export class messagesController {
             await knex(this.config)(this.table).insert(user, message, date);
         } catch (error) {
             console.log(`Hubo un error ${error}`);
-        } finally {
-            knex(this.config).destroy();
-
         }
+        // } finally {
+        //     knex(this.config).destroy();
+        // }
     }
 
     async getAll() {
@@ -44,9 +64,10 @@ export class messagesController {
             return messageInfo;
         } catch (error) {
             console.log("error al obtener mensajes", error);
-        } finally {
-            knex(this.config).destroy();
         }
+        // } finally {
+        //     knex(this.config).destroy();
+        // }
     }
 }
 
