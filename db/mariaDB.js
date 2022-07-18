@@ -5,7 +5,8 @@ const configMariaDb = {
         user: 'root',
         password: '',
         database: 'ecommerce'
-    }
+    },
+    pool: { min: 0, max: 7 }
 }
 
 export default configMariaDb;

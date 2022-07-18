@@ -6,7 +6,10 @@ import { fileURLToPath } from 'url';
 import { Server } from "socket.io";
 import moviesController from "./controllers/movies-controller.js";
 import messagesController from "./controllers/messages-controller.js";
-// import { createChatTable, createMoviesTable } from './controllers/tables-controller.js'
+
+//Middleware del post
+app.use(express.json())
+app.use(express.urlencoded({ extended: true}))
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,54 +23,36 @@ const serverExpress = app.listen(port, (err) => {
 
 app.use(express.static(path.join(__dirname, "./public")));
 
-//Sockets
+const mensajes = []
+const movies = []
 
-// const io = new Server(serverExpress);
-
-// const movies = await moviesController.getAll();
-
-// const messages = await messagesController.getAll();
-// console.log(movies)
-
-// io.on('connection', socket => {
-//     console.log(`Un usuario se ha conectado: ${socket.id}`);
-
-
-//     socket.emit("server:products", movies);
-//     socket.emit("server:message", messages);
-
-//     socket.on("client:movie", (movie) => {
-//         movies.push(movie);
-//         console.log(movies)
-//         io.emit("server:movie", movies);
-//     });
-
-//     socket.on('client:message', async (messageInfo) => {
-//         await messagesController.addMessage(messageInfo);
-//         const messagesLog = await messagesController.getAll();
-//         io.emit("server:messages", { messagesLog });
-//     });
-// });
-
+//Socket
 const io = new Server(serverExpress);
 
 io.on('connection', async socket => {
     console.log(`Un usuario se ha conectado: ${socket.id}`);
 
-    await createChatTable(messagesController, 'chat');            // CREA LA TABLA DE CHATS SI ESTA NO EXISTIA
-    let chat = await messagesController.getAll();                 // SE TRAEN TODOS LOS CHATS DE LA TABLA
+    try {
+        mensajes = await messagesController.getAll()
+        socket.emit('server:mensajes', mensajes )
+    } catch (error) {
+       console.log('Error al adquirir los productos', error) 
+    }
 
-    io.emit('server:messages', chat);                             // AL ESTABLECERSE LA CONEXION SE LE ENVIAN AL CLIENTE LOS PRODUCTOS QUE HAYA EN LA BBDD
-    socket.on('client:message', async messageInfo => {
+    try {
+        movies = await moviesController.getAll()
+        socket.emit('server:movies', movies )
+    } catch (error) {
+       console.log('Error al adquirir los mensajes', error) 
+    }
+                        
+    socket.on('client:mensajes', async messageInfo => {
         await messagesController.addMessage(messageInfo);         // CUANDO EL CLIENTE LE ENVIA AL SERVIDOR UN NUEVO PRODUCTO DESDE EL SERVIDOR SE LO GUARDA EN LA BBDD
-        chat = await messagesController.getAll();                   // SE ESPERA A QUE SE TRAIGAN TODOS LOS PRODUCTOS DE LA BBDD Y SE LOS ALMACENA EN UNA VARIABLE  
-        io.emit('server:messages', chat);                        // SE ENVIA AL CLIENTE LA VARIABLE CONTENEDORA DE TODOS LOS PRODUCTOS PARA QUE SE RENDERICEN
+        mensajes = await messagesController.getAll();                   // SE ESPERA A QUE SE TRAIGAN TODOS LOS PRODUCTOS DE LA BBDD Y SE LOS ALMACENA EN UNA VARIABLE  
+        io.emit('server:mensajes', mensajes);                        // SE ENVIA AL CLIENTE LA VARIABLE CONTENEDORA DE TODOS LOS PRODUCTOS PARA QUE SE RENDERICEN
     })
 
-    await createMoviesTable(moviesController, 'movies');            // CREA LA TABLA DE CHATS SI ESTA NO EXISTIA
-    let movies = await moviesController.getAll();                 // SE TRAEN TODOS LOS CHATS DE LA TABLA
-
-    io.emit('server:movies', movies);                             // AL ESTABLECERSE LA CONEXION SE LE ENVIAN AL CLIENTE LOS PRODUCTOS QUE HAYA EN LA BBDD
+   
     socket.on('client:movie', async movies => {
         await moviesController.addMovie(movies);         // CUANDO EL CLIENTE LE ENVIA AL SERVIDOR UN NUEVO PRODUCTO DESDE EL SERVIDOR SE LO GUARDA EN LA BBDD
         movies = await moviesController.getAll();                   // SE ESPERA A QUE SE TRAIGAN TODOS LOS PRODUCTOS DE LA BBDD Y SE LOS ALMACENA EN UNA VARIABLE  
