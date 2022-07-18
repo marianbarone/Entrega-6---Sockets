@@ -1,7 +1,7 @@
 import knex from "knex";
-import configMariaDb from "../db/mariaDB";
+import configMariaDb from "../db/mariaDB.js";
 
-class productsController {
+class moviesController {
     constructor(config, table) {
         this.table = table;
         this.config = config;
@@ -12,16 +12,16 @@ class productsController {
 
         MariaDB.schema.createTable(this.table, table => {
             table.increments('id').primary()
-            table.string('user', 30)
-            table.string('message', 128)
-            table.timestamp('date').defaultTo(knex.fn.now())
+            table.string('title',)
+            table.number('price',)
+            table.string('thumbnail')
         })
 
         MariaDB.destroy()
 
-        console.log('tabla mensajes en MariaDB creada con éxito')
-        } catch(error) {
-        console.log('error al crear tabla mensajes en MariaDB')
+        console.log('tabla movies en MariaDB creada con éxito')
+    } catch(error) {
+        console.log('error al crear tabla movies en MariaDB')
     }
 
     async getAll() {
@@ -35,9 +35,9 @@ class productsController {
         }
     }
 
-    async addMovie(product) {
+    async addMovie(movie) {
         try {
-            await knex(this.config)(this.table).insert(product);
+            await knex(this.config)(this.table).insert(movie);
         } catch (error) {
             console.log("error al agregar pelicula", error);
         } finally {
@@ -46,4 +46,4 @@ class productsController {
     }
 }
 
-export default new productsController(configMariaDb, 'product');
+export default new moviesController(configMariaDb, 'movies');
