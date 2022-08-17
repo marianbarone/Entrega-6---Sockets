@@ -1,49 +1,42 @@
-import knex from "knex";
-import configMariaDb from "../db/mariaDB.js";
+import mongoose from "mongoose";
+
+mongoose.connect("mongodb://127.0.0.1:27017/ecommerce", (err, res) => {
+    if (err) throw err;
+    return console.log("Base de datos MONGO conectada.");
+})
 
 class moviesController {
-    constructor(config, table) {
-        this.table = table;
-        this.config = config;
+    constructor(collectionName) {
 
-        const MariaDB = knex(configMariaDb)
+        const moviesSchema = mongoose.Schema({
+            movies: {
+                id: { type: String, require: true },
+                title: { type: String, default: null },
+                price: { type: Number, default: null },
+                thumbnail: { type: String, default: null },
+            },
 
-        MariaDB.schema.dropTableIfExists(this.table)
-
-        MariaDB.schema.createTable(this.table, table => {
-            table.increments('id').primary()
-            table.string('title',)
-            table.number('price',)
-            table.string('thumbnail')
         })
-
-        MariaDB.destroy()
-
-        console.log('tabla movies en MariaDB creada con éxito')
-    } catch(error) {
-        console.log('error al crear tabla movies en MariaDB')
+        this.model = mongoose.model(collectionName, moviesSchema);
     }
 
     async getAll() {
         try {
-            const movies = await knex(this.config).from(this.table).select('*');
-            return { movies };
+            const movies = await this.model.find();
+            return movies;
         } catch (error) {
-            console.log("error al obtener peliculas", error);
-        } finally {
-            knex(this.config).destroy();
+            console.log("Error al obtener peliculas", error);
         }
     }
 
     async addMovie(movie) {
         try {
-            await knex(this.config)(this.table).insert(movie);
+            await this.model.create(movie);
+            console.log("Pelicula insertada");
         } catch (error) {
             console.log("error al agregar pelicula", error);
-        } finally {
-            knex(this.config).destroy();
         }
     }
 }
 
-export default new moviesController(configMariaDb, 'movies');
+export default new moviesController("movies");

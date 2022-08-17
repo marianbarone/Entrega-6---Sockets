@@ -1,92 +1,69 @@
 const socket = io();
 
-//AddMovieForm
-const moviesForm = document.getElementById('moviesForm')
-const titleInput = document.getElementById("moviesForm").title
-const priceInput = document.getElementById("moviesForm").price
-const thumbnailInput = document.getElementById("moviesForm").thumbnail
-
-//Chat
-const chatForm = document.getElementById('chatForm')
-const usernameInput = document.getElementById("chatForm").username
-const messageInput = document.getElementById("chatForm").message
-const messagesPool = document.getElementById('messagesPool')
-
-//Agregar nueva pelicula
-function addMovie() {
-    try {
-        const title = titleInput.value;
-        const price = Number(priceInput.value);
-        const thumbnail = thumbnailInput.value;
-        socket.emit("client:movie", { title, price, thumbnail });
-    } catch (err) {
-        console.log(`Hubo un error ${err}`);
-    }
+const renderProducts = async (products) => {
+    const res = await fetch("./views/productsTemplate.ejs");
+    const template = await res.text();
+    const html = ejs.render(template, { products });
+    document.getElementById("products").innerHTML = html;
 }
 
-//Renderiza las peliculas
-async function renderMovies(movies) {
-    const response = await fetch('/movies.hbs')
-    const moviesTable = await response.text()
-    console.log('movies', moviesTable)
-    document.getElementById("movies").innerHTML = "";
-    movies.forEach((movie) => {
-        const template = Handlebars.compile(moviesTable);
-        const html = template(movie);
-        document.getElementById("movies").innerHTML += html;
-    });
+const renderMessages = async (messages, compression) => {
+    const res = await fetch("./views/chatTemplate.ejs");
+    const template = await res.text();
+    const html = ejs.render(template, { messages, compression });
+    document.getElementById("chatLog").innerHTML = html;
 }
 
-function sendMessage() {
-    try {
-        const user = usernameInput.value;
-        const message = messageInput.value;
-        const date = new Date().toLocaleString("es-AR")
-        socket.emit("client:message", { user, message, date });
-    } catch (error) {
-        console.log(`Hubo un error ${error}`);
-    }
-}
+document.getElementById("productsForm")
+    .addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        let obj = {};
+        data.forEach((value, key) => obj[key] = value);
+        socket.emit("client:newProduct", obj);
+        e.target.reset();
+    })
 
-const renderMessages = (messages) => {
-    try {
-        const html = messages
-            .map((messageInfo) => {
-                return (`
-                <div class="col-8">
-                    <p><span class="userEmail text-primary font-weight-bold">${messageInfo.user} :</span>
-                        <span class="userMessage font-italic text-success">${messageInfo.message}</span>
-                    </p>
-                </div>
-                <div class="col-4">
-                    <p>${messageInfo.date}</p>
-                </div>`)
-            })
-            .join(" ");
+document.getElementById("messageCenter")
+    .addEventListener("submit", (e) => {
+        e.preventDefault();
+        const chatBox = e.target.querySelector("[name='message']");
+        const emailInput = e.target.querySelector("[name='email']");
+        if (chatBox.value.trim()) {
+            const message = chatBox.value;
+            const email = emailInput.value;
+            const obj = {
+                author: {
+                    email: email
+                },
+                text: message
+            }
+            socket.emit("client:newMessage", obj);
+            chatBox.value = "";
+            chatBox.focus();
+            emailInput.disabled = true;
+        }
+    })
 
-        messagesPool.innerHTML = html;
-    } catch (error) {
-        console.log(`Hubo un error ${error}`);
-    }
-};
-
-moviesForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    addMovie();
-    titleInput.value = "";
-    priceInput.value = "";
-    thumbnailInput.value = "";
-});
-
-chatForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    sendMessage();
-    messageInput.value = "";
-});
-
-//Pone socket a escuchar
-socket.on('server:movie', movie => {
-    renderMovies(movie)
+//Evento websocket para render de productos.
+socket.on("server:products", (data) => {
+    renderProducts(data.products);
 })
 
-socket.on('server:message', renderMessages);
+
+//Schemas de Normalize
+const authorSchema = new normalizr.schema.Entity("authorEntity", {}, { idAttribute: "email" });
+const messageSchema = new normalizr.schema.Entity("messageEntity", { author: authorSchema }, { idAttribute: "_id" });
+const messageArraySchema = new normalizr.schema.Entity("messageArrayEntity", { messages: [messageSchema] });
+
+//Evento websocket del chat (render de cada mensaje nuevo).
+socket.on("server:messages", (noromalizedData) => {
+    //Denormalizamos el objeto normalizado que recibimos.
+    const denormalizedData = normalizr.denormalize(noromalizedData.result, messageArraySchema, noromalizedData.entities);
+
+    //Calculo % de compresion:
+    const compression = Math.round(JSON.stringify(noromalizedData).length / JSON.stringify(denormalizedData).length * 100 - 100);
+
+    //Rendereamos el array denormalizado y el % de compresion
+    renderMessages(denormalizedData.messages, compression);
+})
