@@ -26,10 +26,7 @@
     "sqlite3": "^5.0.8"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@faker-js/faker": "^7.4.0",
-=======
     "nodemon": "^2.0.19"
->>>>>>> 47398b81f25fea9570219fb765137dbb707c7d16
   }
 }
