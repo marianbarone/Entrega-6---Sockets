@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
-import { URLMongo } from "../options/options.js";
+// import { URLMongo } from "../options/options.js";
+import dotenv from 'dotenv'
+dotenv.config()
 
-mongoose.connect(URLMongo, (err, res) => {
+mongoose.connect(process.env.URLMongo, (err, res) => {
     if (err) throw err;
     return console.log("Base de datos MONGO conectada.");
 })
