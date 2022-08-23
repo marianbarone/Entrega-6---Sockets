@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
+import { URLMongo } from "../options/options.js";
 
-export class messagesController {
+mongoose.connect(URLMongo, (err, res) => {
+    if (err) throw err;
+    return console.log("Base de datos MONGO conectada.");
+})
+
+//Clase contenedora de MongoDB para mensajes.
+class messagesController {
     constructor(collectionName) {
         const MessageSchema = mongoose.Schema({
             author: {
@@ -13,28 +20,26 @@ export class messagesController {
             },
             text: { type: String, require: true },
             date: { type: Date, default: Date.now }
-        })
+        });
         this.model = mongoose.model(collectionName, MessageSchema);
     }
 
     async addMessage(data) {
         try {
             await this.model.create(data);
-            console.log('Mensaje insertado')
         } catch (error) {
-            console.log(`Hubo un error ${error}`);
+            console.log("error al añadir mensaje", error);
         }
     }
 
-    async getAll() {
+    async getMessages() {
         try {
-            const messages = await this.model.find();
-            // console.log('mensajes controller', messages)
-            return messages;
+            const data = await this.model.find();
+            return data;
         } catch (error) {
-            console.log("Error al obtener mensajes", error);
+            console.log("error al obtener mensajes", error);
         }
     }
 }
 
-export default new messagesController("message");
+export default new messagesController('message');

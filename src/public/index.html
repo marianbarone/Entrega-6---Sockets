@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Desafio Websockets</title>
+</head>
+
+<body class="bg-dark">
+    <div class="container">
+        <section class="bg-light mt-5 p-3" style="border-radius: 10px;">
+            <div class="container text-center">
+                <div class="mb-4">
+                    <h2>Ingresá el producto</h2>
+                    <form class='form-floating form mt-4' id="productsForm">
+                        <div class="form-floating mb-3 fs-6">
+                            <input type="text" name="title" class="form-control" id="title" placeholder="Batman Begins">
+                            <label for="title">Título</label>
+                        </div>
+                        <div class="form-floating mb-3 fs-6">
+                            <input type="number" name="price" class="form-control" id="price" placeholder="Precio">
+                            <label for="price">Precio</label>
+                        </div>
+                        <div class="form-floating mb-3 fs-6">
+                            <input type="text" name='thumbnail' class="form-control" id="thumbnail"
+                                placeholder="Imágen">
+                            <label for="thumbnail">Imagen</label>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Enviar</button>
+
+                    </form>
+
+                </div>
+            </div>
+            <!-- Aqui se renderea la plantilla de productos -->
+            <div id="products" class="mt-5 container text-center" style="border-radius: 10px;"></div>
+        </section>
+        <section class="bg-light mt-3 p-3" style="border-radius: 10px;">
+            <div class="container container text-center mt-3">
+                <h3>Mensajes</h3>
+                <form class='form-floating form mt-4' id="messageCenter">
+                    <div class="form-floating mb-3 fs-6">
+                        <input type="email" name="email" class="form-control" id="username"
+                            placeholder="michael.scott@dundlermiffin.co">
+                        <label for="username">Email</label>
+                    </div>
+                    <div class="form-floating mb-3 fs-6">
+                        <input type="text" name="message" class="form-control" id="message"
+                            placeholder="Cuéntanos algo...">
+                        <label for="message">Mensaje</label>
+                    </div>
+                    <button type="submit" class="btn btn-dark" id="btnChat">Enviar</button>
+                    <div id="chatLog" class="p-3 border border-white" style="max-height: 400px; overflow-y: auto;">
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <!-- EJS -->
+    <script src="ejs.min.js"></script>
+    <!-- NORMALIZR -->
+    <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.min.js"></script>
+    <!-- Websockets -->
+    <script src="./socket.io/socket.io.js"></script>
+    <!-- Own JS -->
+    <script src="main.js"></script>
+</body>
+
+</html>
