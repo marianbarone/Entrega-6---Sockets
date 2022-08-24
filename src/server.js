@@ -5,6 +5,11 @@ import productsController from "./controllers/products-controller.js";
 import messagesController from "./controllers/messages-controller.js";
 import { faker } from '@faker-js/faker';
 import { normalize, schema } from "normalizr";
+import auth from './middlewares/auth.js';
+import session from "express-session";
+import mongoStore from "connect-mongo";
+import dotenv from 'dotenv';
+dotenv.config()
 
 faker.locale = "es";
 
@@ -22,6 +27,46 @@ app.use(express.static(__dirname + "/public"));
 
 app.set("views", __dirname + "/public/views");
 app.set("view engine", ".ejs");
+
+//MongoAtlas config
+
+const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+app.use(session({
+    store: mongoStore.create({ mongoUrl: process.env.URLMongo, mongoOptions }),
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+        maxAge: 600000
+    }
+}));
+
+app.get("/", auth, (req, res) => {
+    res.render("index.ejs", { name: req.session.user })
+});
+
+app.post("/login", (req, res) => {
+    const user = req.body.name;
+    console.log(user)
+    req.session.user = user;
+    res.redirect("/");
+});
+
+app.get("/login", (req, res) => {
+    if (req.session?.user) return res.redirect("/");
+    res.sendFile(__dirname + "/public/login.html");
+});
+
+app.get("/logout", (req, res) => {
+    if (req.session?.user) {
+        const name = req.session?.user;
+        req.session.destroy();
+        return res.render("logout.ejs", { name })
+    };
+
+    res.redirect("/login");
+});
 
 //Ruta de testeo con Faker.js
 app.use("/api/productos-test", (req, res) => {
