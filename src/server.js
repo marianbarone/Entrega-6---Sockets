@@ -5,11 +5,19 @@ import productsController from "./controllers/products-controller.js";
 import messagesController from "./controllers/messages-controller.js";
 import { faker } from '@faker-js/faker';
 import { normalize, schema } from "normalizr";
-import auth from './middlewares/auth.js';
 import session from "express-session";
 import mongoStore from "connect-mongo";
+import passport from "passport";
 import dotenv from 'dotenv';
 dotenv.config()
+
+//Routes
+
+import loginRouter from './routes/loginRouter.js'
+import logoutRouter from './routes/logoutRouter.js'
+import rootRouter from './routes/rootRouter.js'
+import signupRouter from './routes/signupRouter.js'
+
 
 faker.locale = "es";
 
@@ -30,45 +38,85 @@ app.set("view engine", ".ejs");
 
 //MongoAtlas config
 
-const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+// const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+// app.use(session({
+//     store: mongoStore.create({ mongoUrl: process.env.URLMongo, mongoOptions }),
+//     secret: "secret",
+//     resave: false,
+//     saveUninitialized: false,
+//     rolling: true,
+//     cookie: {
+//         maxAge: 600000
+//     }
+// }));
+
+
 app.use(session({
-    store: mongoStore.create({ mongoUrl: process.env.URLMongo, mongoOptions }),
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false,
-    rolling: true,
+    secret: 'keyboard cat',
     cookie: {
-        maxAge: 600000
-    }
+        httpOnly: false,
+        secure: false,
+        // maxAge: config.TIEMPO_EXPIRACION
+    },
+    rolling: true,
+    resave: true,
+    saveUninitialized: false
 }));
 
-app.get("/", auth, (req, res) => {
-    res.render("index.ejs", { name: req.session.user })
-});
+//Passport
 
-app.post("/login", (req, res) => {
-    const user = req.body.name;
-    console.log(user)
-    req.session.user = user;
-    res.redirect("/");
-});
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get("/login", (req, res) => {
-    if (req.session?.user) return res.redirect("/");
-    res.sendFile(__dirname + "/public/login.html");
-});
+//INDEX
+app.use('/', rootRouter);
+//LOGIN
+app.use('/login', loginRouter);
+// app.get('/faillogin', routes.getFaillogin);
 
-app.get("/logout", (req, res) => {
-    if (req.session?.user) {
-        const name = req.session?.user;
-        req.session.destroy();
-        return res.render("logout.ejs", { name })
-    };
+//SIGNUP
+app.use('/signup', signupRouter);
+// app.get('/failsignup', routes.getFailsignup);
+//LOGOUT
+app.use('/logout', logoutRouter);
+// FAIL ROUTE
+// app.use('*', routes.failRoute);
 
-    res.redirect("/login");
-});
+// app.get('/ruta-protegida',checkAuthentication, (req, res) => {
+//     //do something only if user is authenticated
+//     let user = req.user;
+//     console.log(user);
+//     res.send('sh1>Ruta OK!</h1>');
+// });
 
-//Ruta de testeo con Faker.js
+
+// app.get("/", auth, (req, res) => {
+//     res.render("index.ejs", { name: req.session.user })
+// });
+
+// app.post("/login", (req, res) => {
+//     const user = req.body.name;
+//     console.log(user)
+//     req.session.user = user;
+//     res.redirect("/");
+// });
+
+// app.get("/login", (req, res) => {
+//     if (req.session?.user) return res.redirect("/");
+//     res.sendFile(__dirname + "/public/login.html");
+// });
+
+// app.get("/logout", (req, res) => {
+//     if (req.session?.user) {
+//         const name = req.session?.user;
+//         req.session.destroy();
+//         return res.render("logout.ejs", { name })
+//     };
+
+//     res.redirect("/login");
+// });
+
+// Ruta de testeo con Faker.js
 app.use("/api/productos-test", (req, res) => {
     const products = [];
     for (let index = 0; index < 5; index++) {

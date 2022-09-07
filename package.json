@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "connect-mongo": "^4.6.0",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
@@ -23,6 +24,8 @@
     "mysql": "^2.18.1",
     "normalize": "^0.3.1",
     "normalizr": "^3.6.2",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "pug": "^3.0.2",
     "pug-cli": "^1.0.0-alpha6",
     "socket.io": "^4.5.1",
