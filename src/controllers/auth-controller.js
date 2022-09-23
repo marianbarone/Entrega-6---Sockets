@@ -11,18 +11,6 @@ const getRoot = (req, res) => {
 
 //LOGIN
 
-// const getLogin = (req, res) => {
-//     if (req.isAuthenticated()) {
-//         return res.redirect("/");
-//         console.log('user logueado');
-//         // res.render('profileUser', { user });
-//     } else {
-//         console.log('user NO logueado');
-//         res.sendFile(__dirname + "/views/login.ejs");
-
-//     }
-// }
-
 const getLogin = (req, res) => {
     if (req.isAuthenticated()) return res.redirect("/");
     res.sendFile(__dirname + "/public/views/login.html");
@@ -90,15 +78,6 @@ const postSignup = async (req, res) => {
     res.redirect("/login");
 }
 
-// const getFaillogin = (req, res) => {
-//     console.log('error en login');
-//     res.render('login-error',{});
-// }
-
-// const getFailsignup = (req, res) => {
-//     console.log('error en signup');
-//     res.render('signup-error', {});
-// }
 
 // LOGOUT
 const getLogout = (req, res) => {
@@ -112,17 +91,9 @@ const getLogout = (req, res) => {
 }
 
 const failRoute = (req, res) => {
-    res.status(404).render('routing-error', {});
+    logger.warn(`Ruta: ${req.url} | Método: ${req.method}`);
+    res.status(404).render('error', {});
 }
-
-// function checkAuthentication(req, res, next) {
-//     if (req.isAuthenticated()){
-//         //req.isAuthenticated() will return true if user is logged in
-//         next();
-//     } else {
-//     res.redirect("/login");
-//     }
-// }
 
 export default {
     getRoot,
@@ -130,8 +101,6 @@ export default {
     getSignup,
     postLogin,
     postSignup,
-    // getFaillogin,
-    // getFailsignup,
     getLogout,
     failRoute
 }

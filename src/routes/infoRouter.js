@@ -1,5 +1,7 @@
 import { Router } from "express";
 import yargs from "yargs/yargs";
+import os from "os";
+
 
 const router = Router();
 
@@ -14,8 +16,13 @@ router.get("/", (req, res) => {
         rss: process.memoryUsage().rss,
         path: process.argv[0],
         pid: process.pid,
-        folder: process.argv[1]
+        folder: process.argv[1],
+        cpus: os.cpus().length,
+
     }
+
+    console.log(info);
+
     res.render("info.ejs", info);
 });
 

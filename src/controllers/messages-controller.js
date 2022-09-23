@@ -2,10 +2,11 @@ import mongoose from "mongoose";
 // import { URLMongo } from "../options/options.js";
 import dotenv from 'dotenv'
 dotenv.config()
+import logger from "../middlewares/logs.js";
 
 mongoose.connect(process.env.URLMongo, (err, res) => {
     if (err) throw err;
-    return console.log("Base de datos MONGO conectada.");
+    return logger.info("Base de datos MONGO conectada.");
 })
 
 //Clase contenedora de MongoDB para mensajes.

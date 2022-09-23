@@ -20,14 +20,19 @@ import rootRouter from './routes/rootRouter.js'
 import signupRouter from './routes/signupRouter.js'
 import infoRouter from './routes/infoRouter.js'
 import randomsRouter from './routes/randomsRouter.js'
+import compression from 'compression'
+import logger from "./middlewares/logs.js";
 
 faker.locale = "es";
 
-const modo = parseInt(process.argv[3]) || 'CLUSTER'
-console.log(modo)
+const modo = parseInt(process.argv[3]) || 'FORK'
 const port = Number(process.argv[2]) || 8080
 
+
 const app = express();
+
+app.use(compression())
+
 
 const numCpus = os.cpus();
 
@@ -37,7 +42,7 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
     });
 
     cluster.on("exit", (worker) => {
-        console.log(`worker ${worker.process.pid} died :(`);
+        logger.info(`worker ${worker.process.pid} died :(`);
         cluster.fork();
     })
 } else {
@@ -46,7 +51,7 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
     app.use(express.urlencoded({ extended: true }));
 
     const PORT = process.env.PORT || 8080;
-    const serverExpress = app.listen(PORT, (err) => err ? console.log(`Error en el server: ${err}`) : console.log(`Server listening on PORT: ${PORT}`));
+    const serverExpress = app.listen(PORT, (err) => err ? logger.error(`Error en el server: ${err}`) : logger.info(`Server listening on PORT: ${PORT}`));
 
     const io = new IOServer(serverExpress);
 
@@ -54,20 +59,6 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
 
     app.set("views", __dirname + "/public/views");
     app.set("view engine", ".ejs");
-
-    //MongoAtlas config
-
-    // const mongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
-    // app.use(session({
-    //     store: mongoStore.create({ mongoUrl: process.env.URLMongo, mongoOptions }),
-    //     secret: "secret",
-    //     resave: false,
-    //     saveUninitialized: false,
-    //     rolling: true,
-    //     cookie: {
-    //         maxAge: 600000
-    //     }
-    // }));
 
 
     app.use(session({
@@ -114,6 +105,11 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
         res.status(404).render("productsTemplate.ejs", { products });
     })
 
+    app.use((req, res, next) => {
+        logger.info(`Ruta: ${req.url} | Método: ${req.method}`);
+        next();
+    });    
+
     //Schemas de Normalize
     const authorSchema = new schema.Entity("authorEntity", {}, { idAttribute: "email" });
     const messageSchema = new schema.Entity("messageEntity", { author: authorSchema }, { idAttribute: "_id" });
@@ -131,7 +127,7 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
 
     //Conexion websockets
     io.on("connection", async (socket) => {
-        console.log(`Socket ID: ${socket.id} connected`);
+        logger.info(`Socket ID: ${socket.id} connected`);
 
         const products = await productsController.getAll();
         socket.emit("server:products", products);
