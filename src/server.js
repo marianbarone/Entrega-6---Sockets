@@ -3,7 +3,7 @@ import { Server as IOServer } from "socket.io";
 import __dirname from "./utils.js";
 import productsController from "./controllers/products-controller.js";
 import messagesController from "./controllers/messages-controller.js";
-import { faker } from '@faker-js/faker';
+// import { faker } from '@faker-js/faker';
 import { normalize, schema } from "normalizr";
 import session from "express-session";
 import passport from "passport";
@@ -23,7 +23,7 @@ import randomsRouter from './routes/randomsRouter.js'
 import compression from 'compression'
 import logger from "./middlewares/logs.js";
 
-faker.locale = "es";
+// faker.locale = "es";
 
 const modo = parseInt(process.argv[3]) || 'FORK'
 const port = Number(process.argv[2]) || 8080
@@ -92,18 +92,18 @@ if (modo == "CLUSTER" && cluster.isPrimary) {
     app.use("/api/randoms", randomsRouter);
 
     // Ruta de testeo con Faker.js
-    app.use("/api/productos-test", (req, res) => {
-        const products = [];
-        for (let index = 0; index < 5; index++) {
-            const obj = {};
-            obj.id = products[products.length - 1]?.id + 1 || 1;
-            obj.title = faker.commerce.productName();
-            obj.price = faker.commerce.price(100);
-            obj.thumbnail = faker.image.fashion(400, 400, true);
-            products.push(obj);
-        }
-        res.status(404).render("productsTemplate.ejs", { products });
-    })
+    // app.use("/api/productos-test", (req, res) => {
+    //     const products = [];
+    //     for (let index = 0; index < 5; index++) {
+    //         const obj = {};
+    //         obj.id = products[products.length - 1]?.id + 1 || 1;
+    //         obj.title = faker.commerce.productName();
+    //         obj.price = faker.commerce.price(100);
+    //         obj.thumbnail = faker.image.fashion(400, 400, true);
+    //         products.push(obj);
+    //     }
+    //     res.status(404).render("productsTemplate.ejs", { products });
+    // })
 
     app.use((req, res, next) => {
         logger.info(`Ruta: ${req.url} | Método: ${req.method}`);
